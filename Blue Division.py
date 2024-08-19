@@ -92,7 +92,10 @@ def check_for_updates():
         if latest_script_version != current_script_version:
             update_script(latest_script_version, script_download_url)
             config['VERSIONS']['script_version'] = latest_script_version
+    except Exception:
+        messagebox.showwarning("Offline Mode", "Could not check for script updates")
 
+    try:
         # Check for game updates
         game_response = requests.get(GAME_REPO)
         game_data = game_response.json()
@@ -107,8 +110,8 @@ def check_for_updates():
         with open(CONFIG_FILE, 'w') as configfile:
             config.write(configfile)
 
-    except requests.exceptions.RequestException as e:
-        messagebox.showwarning("Offline Mode", "Could not check for updates. The application will run in offline mode.")
+    except Exception:
+        messagebox.showwarning("Offline Mode", "Could not check for game updates.")
 
 def launch_game():
     if os.path.exists(GAME_EXECUTABLE):
