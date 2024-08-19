@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 import zipfile
 import shutil
@@ -10,7 +11,7 @@ root = Tk()
 root.withdraw()
 
 # Paths and URLs
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 CONFIG_FILE = os.path.join(SCRIPT_DIR, 'config.txt')
 GAME_DIR = os.path.join(SCRIPT_DIR, 'game')
 GAME_EXECUTABLE = os.path.join(GAME_DIR, 'BDivision S.C.H.A.L.E. Defense.exe')
@@ -51,8 +52,19 @@ def update_script(latest_version, download_url):
     if prompt_user(f"A new script version ({latest_version}) is available. Would you like to update?"):
         temp_filename = os.path.join(SCRIPT_DIR, 'auto_updater_new.exe')
         download_file(download_url, temp_filename)
+
+        # Update config with new script version before replacing the current script
+        config['VERSIONS']['script_version'] = latest_version
+        with open(CONFIG_FILE, 'w') as configfile:
+            config.write(configfile)
+
+        # Replace current script with the new version
+        new_script_path = os.path.join(SCRIPT_DIR, 'auto_updater_new.exe')
+        current_script_path = os.path.join(SCRIPT_DIR, os.path.basename(__file__))
+        os.replace(new_script_path, current_script_path)
+
         messagebox.showinfo("Update", "The script has been updated. Please restart the application.")
-        os.startfile(temp_filename)
+        os.startfile(current_script_path)
         exit(0)
 
 def update_game(latest_version, download_url):
@@ -91,7 +103,6 @@ def check_for_updates():
         current_script_version = config['VERSIONS']['script_version']
         if latest_script_version != current_script_version:
             update_script(latest_script_version, script_download_url)
-            config['VERSIONS']['script_version'] = latest_script_version
     except Exception:
         messagebox.showwarning("Offline Mode", "Could not check for script updates")
 
