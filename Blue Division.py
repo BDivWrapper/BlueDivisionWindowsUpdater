@@ -50,7 +50,7 @@ def flatten_directory(dir):
 
 def update_script(latest_version, download_url):
     if prompt_user(f"A new script version ({latest_version}) is available. Would you like to update?"):
-        temp_filename = os.path.join(SCRIPT_DIR, 'auto_updater_new.exe')
+        temp_filename = os.path.join(SCRIPT_DIR, 'tmp_bdiv.exe')
         download_file(download_url, temp_filename)
 
         # Update config with new script version before replacing the current script
@@ -59,8 +59,8 @@ def update_script(latest_version, download_url):
             config.write(configfile)
 
         # Replace current script with the new version
-        new_script_path = os.path.join(SCRIPT_DIR, 'auto_updater_new.exe')
-        current_script_path = os.path.join(SCRIPT_DIR, os.path.basename(__file__))
+        new_script_path = os.path.join(SCRIPT_DIR, 'tmp_bdiv.exe')
+        current_script_path = os.path.abspath(sys.argv[0])
         os.replace(new_script_path, current_script_path)
 
         messagebox.showinfo("Update", "The script has been updated. Please restart the application.")
